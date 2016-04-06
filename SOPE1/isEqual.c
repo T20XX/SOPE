@@ -6,9 +6,17 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
-#include "simp_file.h"
+//#include "simp_file.h"
 
-int read_simp_files(const char **file, struct simp_file files, int *size){
+struct simp_file{
+	char* path;
+	char* name;
+	char* size;
+	char* permissions;
+	time_t date;
+};
+
+int read_simp_files(const char *file, struct simp_file **files, int *size){
 
 	FILE* fp;
 
@@ -18,21 +26,23 @@ int read_simp_files(const char **file, struct simp_file files, int *size){
 		return 1;
 	}
 
-	*size = 0;
+	*size = 1;
+	printf("%i",*size);
 	char* buf;
 	buf = (char*) malloc(1024);
 	while (fgets(buf, 1024, fp) != NULL){
 		
-		
+		*files = (struct simp_file *)realloc(*files,sizeof(struct simp_file) * (*size));		
+
 		buf[strlen(buf) - 1] = '\0';			// deletes the newline that fgets() stores
-		files[*size].path = (char *)malloc(strlen(buf));
-		strcpy(files[*size].path, buf);
+		(*files[*size]).path = (char *)malloc(strlen(buf));
+		strcpy((*files[*size]).path, buf);
 
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets name
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			files[*size].name = (char *)malloc(strlen(buf));
-			strcpy(files[*size].name, buf);
+			(*files[*size]).name = (char *)malloc(strlen(buf));
+			strcpy((*files[*size]).name, buf);
 		} else {
 			fclose(fp);
 			return 1;
@@ -40,8 +50,8 @@ int read_simp_files(const char **file, struct simp_file files, int *size){
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets size
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			files[*size].size = (char *)malloc(strlen(buf));
-			strcpy(files[*size].size, buf);
+			(*files[*size]).size = (char *)malloc(strlen(buf));
+			strcpy((*files[*size]).size, buf);
 		} else {
 			fclose(fp);
 			return 1;
@@ -50,8 +60,8 @@ int read_simp_files(const char **file, struct simp_file files, int *size){
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets permissions
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			files[*size].permissions = (char *)malloc(strlen(buf));
-			strcpy(files[*size].permissions, buf);
+			(*files[*size]).permissions = (char *)malloc(strlen(buf));
+			strcpy((*files[*size]).permissions, buf);
 		} else {
 			fclose(fp);
 			return 1;
@@ -59,7 +69,7 @@ int read_simp_files(const char **file, struct simp_file files, int *size){
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets date
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			files[*size].date = atol(buf);
+			(*files[*size]).date = atol(buf);
 		} else {
 			fclose(fp);
 			return 1;
@@ -78,7 +88,7 @@ int main(){
 	int size;
 	read_simp_files("files.txt", &files, &size);
 	int i = 0;
-	for (i = 0; i< size; i++){
+	for (i = 0; i< 2; i++){
 		printf("%s\n",files[i].path);
 		printf("%s\n",files[i].name);
 		printf("%s\n",files[i].size);
