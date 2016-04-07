@@ -36,11 +36,11 @@ father = getpid();              // o pid do processo pai
   chdir(argv[1]);                                          // make the dir the current directory
 
 cur_path = getcwd(NULL, 0);				//sets current path
-files_txt_path = (char *)malloc(strlen(cur_path) + strlen("files.txt") + 1);
+files_txt_path = malloc(strlen(cur_path) + strlen("/files.txt") - 15);
 strcpy(files_txt_path, cur_path);
-strcat(files_txt_path, "/");
-strcat(files_txt_path, "files.txt");			//sets files.txt path
-close(open(files_txt_path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR));//clears files.txt
+strcat(files_txt_path, "/files.txt");			//sets files.txt path
+printf("%s\n",files_txt_path);
+//close(open(files_txt_path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR));//clears files.txt
 
 while ((direntp = readdir(dirp)) != NULL) {              // read each entry in the directory
     if (lstat(direntp->d_name, &stat_buf)==-1) {           // get entry data with lstat
@@ -48,6 +48,8 @@ while ((direntp = readdir(dirp)) != NULL) {              // read each entry in t
       exit(3);
     }
     if (S_ISREG(stat_buf.st_mode)){
+    	printf("%s\n",files_txt_path);
+
 	write_regular_file(files_txt_path, cur_path, direntp->d_name, stat_buf);
       	str = "regular";
 	}
@@ -75,6 +77,20 @@ while ((direntp = readdir(dirp)) != NULL) {              // read each entry in t
       str = "other";
     printf("%-25s - %10lu %10lu %s\n", direntp->d_name, stat_buf.st_ino, stat_buf.st_size, str);
   }
+
+sleep(10);
+
+	if (getpid() == father){
+		Simp_file *files;
+		int files_size;
+
+		read_simp_files(files_txt_path, &files, &files_size);
+
+		hardlinker(files, files_size);
+
+	}
+
+
   free(cur_path);
   closedir(dirp);
   exit(0);
