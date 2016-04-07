@@ -8,6 +8,89 @@
 #include <string.h>
 #include "aux.h"
 
+int hardlinker(Simp_file *files, int size){
+
+	int i, j;
+	for(i = 0; i < size; i++){
+		for(j = i; j < size; j++){
+			if(strcmp(files[i].name, files[j].name) == 0){
+				if(strcmp(files[i].permissions, files[j].permissions) == 0){
+					//if(strcmp(files[i].size, files[j].size) == 0){
+					//if(filecmp(files[i].path, files[j].path) == 0){
+					if(files[i].date < files[j].date){
+						link(files[j].path, files[i].path);
+					} else {
+						link(files[i].path, files[j].path);
+					}
+					//}
+					//}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+int filecmp(char* path1, char* path2){
+
+	int des1, des2;
+
+	des1 = open(path1, O_RDONLY);
+	des2 = open(path2, O_RDONLY);
+
+	char *buffer_1;
+	char *buffer_2;
+	buffer_1 = (char *)malloc(sizeof(char));
+	buffer_2 = (char *)malloc(sizeof(char));
+
+	do{
+		if(read(des1, buffer_1,1)==0){
+			if(read(des2, buffer_2,1) == 0){
+			close(des1);
+			close(des2);
+			return 0;
+			}
+		}
+		else if(read(des2, buffer_2,1) == 0){
+			close(des1);
+			close(des2);
+			return 1;
+			}
+
+	}
+	while(strcmp(buffer_1, buffer_2) == 0);
+	close(des1);
+	close(des2);
+	return 1;
+}
+
+//Converts file permissions to string of type: "RWXRWXRWX" or "---------"
+int permissions_toString(mode_t mode, char permissions[9]){
+	for (int i = 0; i < 9; i++){
+		permissions[i] = '-';
+	}
+
+	if (mode & S_IRUSR) permissions[0] = 'R';		//USER PERMISSIONS BITS
+	if (mode & S_IWUSR) permissions[1] = 'W';
+ 	if (mode & S_IXUSR) permissions[2] = 'X';
+
+	if (mode & S_IRGRP) permissions[3] = 'R';		//GROUP PERMISSIONS BITS
+	if (mode & S_IWGRP) permissions[4] = 'W';
+ 	if (mode & S_IXGRP) permissions[5] = 'X';
+
+	if (mode & S_IROTH) permissions[6] = 'R';		//OTHER PERMISSIONS BITS
+	if (mode & S_IWOTH) permissions[7] = 'W';
+ 	if (mode & S_IXOTH) permissions[8] = 'X';
+
+	return 0;
+}
+
+int long_toString(long l, char **string){
+	*string = (char *)malloc(l);
+	sprintf(*string, "%ld",l);
+	return 0;
+}
+
 int write_regular_file(char *path, char *cur_path, char *name, struct stat stat_file){
 	int file;
 	char *pathname;
@@ -39,32 +122,5 @@ int write_regular_file(char *path, char *cur_path, char *name, struct stat stat_
 
         close(file);
 
-	return 0;
-}
-
-//Converts file permissions to string of type: "RWXRWXRWX" or "---------"
-int permissions_toString(mode_t mode, char permissions[9]){
-	for (int i = 0; i < 9; i++){
-		permissions[i] = '-';
-	}
-
-	if (mode & S_IRUSR) permissions[0] = 'R';		//USER PERMISSIONS BITS
-	if (mode & S_IWUSR) permissions[1] = 'W';
- 	if (mode & S_IXUSR) permissions[2] = 'X';
-
-	if (mode & S_IRGRP) permissions[3] = 'R';		//GROUP PERMISSIONS BITS
-	if (mode & S_IWGRP) permissions[4] = 'W';
- 	if (mode & S_IXGRP) permissions[5] = 'X';
-
-	if (mode & S_IROTH) permissions[6] = 'R';		//OTHER PERMISSIONS BITS
-	if (mode & S_IWOTH) permissions[7] = 'W';
- 	if (mode & S_IXOTH) permissions[8] = 'X';
-
-	return 0;
-}
-
-int long_toString(long l, char **string){
-	*string = (char *)malloc(l);
-	sprintf(*string, "%ld",l);
 	return 0;
 }

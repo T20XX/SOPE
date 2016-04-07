@@ -6,17 +6,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
-//#include "simp_file.h"
+#include "simp_file.h"
 
-struct simp_file{
-	char* path;
-	char* name;
-	char* size;
-	char* permissions;
-	time_t date;
-};
+//struct Simp_file;
 
-int read_simp_files(const char *file, struct simp_file **files, int *size){
+int read_simp_files(const char *file, Simp_file **files, int *size){
 
 	FILE* fp;
 
@@ -28,14 +22,14 @@ int read_simp_files(const char *file, struct simp_file **files, int *size){
 
 	*size = 0;
 
-	struct simp_file *tmp;
+	Simp_file *tmp;
 	*files = NULL;//malloc(sizeof(struct simp_file));
 
 	char* buf;
 	buf = (char*) malloc(1024);
 	while (fgets(buf, 1024, fp) != NULL){
 
-		tmp = realloc(*files,sizeof(struct simp_file) * ((*size) + 1));
+		tmp = realloc(*files,sizeof(Simp_file) * ((*size) + 1));
 
 		if(tmp != NULL){						//Tests if reallocation of memory went fine
 			*files = tmp;

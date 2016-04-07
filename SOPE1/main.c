@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include "aux.h"
+#include "simp_file.h"
 
 int main(int argc, char *argv[]) {
   DIR *dirp;
