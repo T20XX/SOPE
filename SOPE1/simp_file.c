@@ -39,13 +39,13 @@ int read_simp_files(const char *file, Simp_file **files, int *size){
 		}
 
 		buf[strlen(buf) - 1] = '\0';			// deletes the newline that fgets() stores
-		(*files)[*size].path = (char *)malloc(strlen(buf));
+		(*files)[*size].path = (char *)malloc(strlen(buf) + 1);
 		strcpy((*files)[*size].path, buf);
 
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets name
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			(*files)[*size].name = (char *)malloc(strlen(buf));
+			(*files)[*size].name = (char *)malloc(strlen(buf) + 1);
 			strcpy((*files)[*size].name, buf);
 		} else {
 			fclose(fp);
@@ -54,7 +54,7 @@ int read_simp_files(const char *file, Simp_file **files, int *size){
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets size
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			(*files)[*size].size = (char *)malloc(strlen(buf));
+			(*files)[*size].size = (char *)malloc(strlen(buf) + 1);
 			strcpy((*files)[*size].size, buf);
 		} else {
 			fclose(fp);
@@ -64,7 +64,7 @@ int read_simp_files(const char *file, Simp_file **files, int *size){
 
 		if(fgets(buf, 1024, fp) != NULL){		//gets permissions
 			buf[strlen(buf) - 1] = '\0';		// deletes the newline that fgets() stores
-			(*files)[*size].permissions = (char *)malloc(strlen(buf));
+			(*files)[*size].permissions = (char *)malloc(strlen(buf) + 1);
 			strcpy((*files)[*size].permissions, buf);
 		} else {
 			fclose(fp);
